@@ -9,7 +9,9 @@ const routes = [
 
 const router = new VueRouter({
   routes: [
-    { path: '/login', component: () => import('@/views/LoginPage.vue') }
+    { path: '/', component: () => import('@/views/LoginPage.vue'),redirect: '/login', },
+    { path: '/login', component: () => import('@/views/LoginPage.vue') },
+    { path: '/home', component: () => import('@/views/HomePage.vue') },
   ]
 })
 
