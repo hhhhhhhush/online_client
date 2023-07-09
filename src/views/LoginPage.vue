@@ -7,33 +7,48 @@
                 <p class="banner">用 心 做 教 育</p>
                 <ul>
                     <li>帮助</li>
-                    <li>进入关怀模式</li>
+                    <li>关于我们</li>
+                    <li class="toUs">
+                        联系我们
+                        <div class="contact">
+                            <img src="../images/contact.png" alt="">
+                        </div>
+                    </li>
                 </ul>
             </nav>
         </div>
-        <div class="content" v-if="flag">
-            <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
-                <h3>用户登录</h3>
+        <div class="content">
+            <div class="panel">
+                <h3 @click="showLogin" :class="{ active: activeTab === 'login' }">Login</h3>
+                <h3 @click="showRegister" :class="{ active: activeTab === 'register' }">Register</h3>
+            </div>
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" v-if="showPanel">
                 <el-form-item label="请输入用户名" prop="username">
                     <el-input v-model="ruleForm.username" placeholder="请输入用户名或手机号"></el-input>
                 </el-form-item>
                 <el-form-item label="请输入密码" prop="password">
-                    <el-input v-model="ruleForm.password" placeholder="请输入密码"></el-input>
+                    <el-input type="password" v-model="ruleForm.password" placeholder="密码由字母数字下划线组成"></el-input>
                 </el-form-item>
+                <el-button plain class="loginBtn" @click="toHome">登录</el-button>
             </el-form>
-            <el-button plain class="loginBtn" @keyup.enter="toHome" @click="toHome">登录</el-button>
-        </div>
-        <div class="content" v-else>
-            <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
-                <h3>用户登录</h3>
-                <el-form-item label="请输入手机号" prop="username">
-                    <el-input v-model="ruleForm.username" placeholder="请输入用户名或手机号"></el-input>
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" v-else>
+                <el-form-item label="请输入手机号" prop="phone"><br>
+                    <el-input v-model="ruleForm.phone" placeholder="请输入11位手机号"></el-input>
                 </el-form-item>
-                <el-form-item label="请输入密码" prop="password">
-                    <el-input v-model="ruleForm.password" placeholder="请输入密码"></el-input>
+                <el-form-item label="请输入验证码" prop="verify"><br>
+                    <el-input v-model="ruleForm.verify" placeholder="请输入验证码" class="mobileInput"></el-input>
+                    <span class="verify" @click="startCountdown" v-if="!isCounting">获取验证码</span>
+                    <span class="verify" v-else>{{ countdown }}s 后重置</span>
                 </el-form-item>
+                <el-form-item label="请输入密码" prop="password"><br>
+                    <el-input type="password" v-model="ruleForm.password" placeholder="密码由字母数字下划线组成"></el-input>
+                </el-form-item>
+                <el-form-item label="请确认密码" prop="password2"><br>
+                    <el-input type="password" v-model="ruleForm.password2" placeholder="密码由字母数字下划线组成"></el-input>
+                </el-form-item>
+                <el-button plain class="loginBtn" @click="toRegister">注册</el-button>
             </el-form>
-            <el-button plain class="loginBtn" @keyup.enter="toHome" @click="toHome">登录</el-button>
+
         </div>
     </div>
 </template>
@@ -46,10 +61,17 @@ export default {
     data() {
         return {
             phone: "",
-            flag: false,
+            showPanel: true, //登录注册面板切换
+            activeTab: 'login',
+            countdown: 0, // 倒计时秒数
+            isCounting: false, // 是否正在倒计时,
+            showQRCode: false, // 控制二维码图片的显示与隐藏
             ruleForm: {
                 username: '',
-                password: ''
+                password: '',
+                password2: '',
+                phone: "",
+                verify: ""
             },
             rules: {
                 username: [
@@ -58,12 +80,36 @@ export default {
                 ],
                 password: [
                     { required: true, message: '请输入密码', trigger: 'blur' },
-                    { pattern: /^\w{6,12}$/, message: '长度在 6 到 12 个字符', trigger: 'blur' }
+                    { pattern: /^\w{6,30}$/, message: '长度在 6 到 30个字符', trigger: 'blur' }
+                ],
+                password2: [
+                    { required: true, message: '请输入密码', trigger: 'blur' },
+                    { pattern: /^\w{6,30}$/, message: '长度在 6 到 30个字符', trigger: 'blur' }
+                ],
+                phone: [
+                    { required: true, message: '请输入11位手机号', trigger: 'blur' },
+                    { min: 11, max: 11, message: '手机号必须为11位', trigger: ['blur', 'change'] }
+                ],
+                verify: [
+                    { required: true, message: '请输入验证码', trigger: 'blur' },
+                    { min: 5, max: 5, message: '验证码为5为数字', trigger: 'blur' }
                 ],
             }
         }
     },
     methods: {
+        // 登录注册面板切换
+        showLogin() {
+            this.showPanel = true;
+            this.activeTab = 'login';
+            this.$refs.ruleForm.resetFields();
+        },
+        showRegister() {
+            this.showPanel = false;
+            this.activeTab = 'register';
+            this.$refs.ruleForm.resetFields();
+        },
+        // 验证数据库，完成登录功能
         async toHome() {
             if (this.ruleForm.username.length === 11) {
                 this.phone = this.ruleForm.username
@@ -77,17 +123,77 @@ export default {
             console.log(res.data)
             const data = res.data;
             if (res.data.code === 200) {
-                // router.push('/home')
+                router.push('/home')
                 this.$message({
                     message: '登录成功~',
-                    type: 'success'
+                    type: 'success',
+                    duration: 1000
                 });
-                
+
             }
             else {
                 this.$message.error(data.msg);
             }
-
+        },
+        // 验证码功能实现
+        startCountdown() {
+            this.countdown = 30; // 设置倒计时秒数为30
+            this.isCounting = true; // 开始倒计时
+            this.countdownTimer = setInterval(() => {
+                if (this.countdown > 0) {
+                    this.countdown--; // 每秒减少一秒
+                } else {
+                    this.resetCountdown(); // 倒计时结束，重置倒计时
+                }
+            }, 1000);
+        },
+        resetCountdown() {
+            clearInterval(this.countdownTimer); // 清除定时器
+            this.countdown = 0; // 重置倒计时秒数
+            this.isCounting = false; // 停止倒计时
+        },
+        // 验证数据库，完成注册功能
+        async toRegister() {
+            if (this.ruleForm.phone.length === 11 && (this.ruleForm.password === this.ruleForm.password2)) {
+                const res = await axios.post(`http://localhost:3000/user/register`, {
+                    password: this.ruleForm.password,
+                    phone: this.ruleForm.phone
+                })
+                var regRes = res;
+            }
+            else if (this.ruleForm.password != this.ruleForm.password2) {
+                this.$message.error("两次输入密码不一致哦")
+                return
+            }
+            else {
+                this.$message.error("手机号格式不正确 !")
+                return
+            }
+            // console.log(res)
+            if (regRes.status === 201 && this.ruleForm.verify.length === 5) {
+                // 注册成功
+                // console.log(this.showPanel)
+                // this.showPanel = true;
+                // this.activeTab = 'login';
+                // this.$refs.ruleForm.resetFields();
+                this.$alert('请返回登录界面噢~', '注册成功啦~', {
+                    confirmButtonText: '确定',
+                    callback: action => {
+                        this.$message({
+                            type: 'success',
+                            message: "欢迎新的小主人...",
+                            duration: 1000
+                        });
+                    }
+                })
+            } else {
+                // 其他状态码处理
+                if (this.ruleForm.verify.length != 5) {
+                    this.$message.error('验证码格式错误!')
+                    return
+                }
+                this.$message.error(regRes.data.msg);
+            }
         }
     }
 }
@@ -107,7 +213,7 @@ export default {
 }
 
 .nav nav {
-    width: 1200px;
+    width: 1400px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
@@ -132,6 +238,32 @@ export default {
 .nav nav ul li:hover {
     cursor: pointer;
     color: #FA2;
+}
+
+.toUs {
+    position: relative;
+}
+
+.toUs:hover .contact {
+    display: block;
+}
+
+.contact {
+    width: 100px;
+    height: 100px;
+    background-color: #fff;
+    display: none;
+    position: absolute;
+    top: 70px;
+    left: -15px;
+    z-index: 200;
+    transition: all 0.3s;
+}
+
+.contact img {
+    position: absolute;
+    top: 10px;
+    left: 10px;
 }
 
 .banner {
@@ -169,9 +301,41 @@ export default {
     color: #333;
 }
 
+.content .panel {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.content .panel>h3:hover {
+    cursor: pointer;
+    color: #FA2;
+}
+
+.content .panel>h3:last-child {
+    margin-left: 20px;
+}
+
 .loginBtn {
     margin-top: 15px;
     margin-left: 60px;
     width: 70%;
 }
-</style>
+
+.mobileInput {
+    width: 340px;
+}
+
+.verify {
+    display: inline-block;
+    margin-left: 20px;
+    background-color: #37A3F0;
+    border-radius: 6px;
+    padding: 0px 8px;
+    color: white;
+    cursor: pointer;
+}
+
+.active {
+    border-bottom: 4px solid #FA2;
+    padding-bottom: 8px;
+}</style>
