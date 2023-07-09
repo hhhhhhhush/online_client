@@ -23,8 +23,8 @@
                 <h3 @click="showRegister" :class="{ active: activeTab === 'register' }">Register</h3>
             </div>
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" v-if="showPanel">
-                <el-form-item label="请输入用户名" prop="username">
-                    <el-input v-model="ruleForm.username" placeholder="请输入用户名或手机号"></el-input>
+                <el-form-item label="请输入手机号" prop="username">
+                    <el-input v-model="ruleForm.username" placeholder="请输入手机号"></el-input>
                 </el-form-item>
                 <el-form-item label="请输入密码" prop="password">
                     <el-input type="password" v-model="ruleForm.password" placeholder="密码由字母数字下划线组成"></el-input>
@@ -56,6 +56,7 @@
 <script>
 import axios from 'axios';
 import router from '@/router/index'
+import { mapMutations } from 'vuex';
 export default {
     name: 'login',
     data() {
@@ -75,8 +76,8 @@ export default {
             },
             rules: {
                 username: [
-                    { required: true, message: '请输入用户名', trigger: 'blur' },
-                    { min: 3, max: 12, message: '长度在 3 到 12 个字符', trigger: ['blur', 'change'] }
+                    { required: true, message: '请输入手机号', trigger: 'blur' },
+                    { min: 11, max: 11, message: '请输入11位手机号', trigger: ['blur', 'change'] }
                 ],
                 password: [
                     { required: true, message: '请输入密码', trigger: 'blur' },
@@ -98,6 +99,7 @@ export default {
         }
     },
     methods: {
+        ...mapMutations(['setUser']),
         // 登录注册面板切换
         showLogin() {
             this.showPanel = true;
@@ -120,14 +122,21 @@ export default {
                 password: this.ruleForm.password,
                 phone: this.phone
             })
-            console.log(res.data)
             const data = res.data;
             if (res.data.code === 200) {
+                // 将数据传递给vuex vuex刷新数据会消失，Vuex 中的状态是存储在内存中的，而不是持久化存储。
+                this.setUser(data.data)
+                // 把数据给本地存储
+                localStorage.setItem('userInfo', JSON.stringify(data.data));
                 router.push('/home')
+                // console.log(data.data)
                 this.$message({
-                    message: '登录成功~',
+                    message: "欢迎回来" + data.data.username + "~",
                     type: 'success',
-                    duration: 1000
+                    duration: 2000,
+                    center: true,
+                    showClose: true,
+                    offset: 80
                 });
 
             }
@@ -178,13 +187,6 @@ export default {
                 // this.$refs.ruleForm.resetFields();
                 this.$alert('请返回登录界面噢~', '注册成功啦~', {
                     confirmButtonText: '确定',
-                    callback: action => {
-                        this.$message({
-                            type: 'success',
-                            message: "欢迎新的小主人...",
-                            duration: 1000
-                        });
-                    }
                 })
             } else {
                 // 其他状态码处理
@@ -338,4 +340,5 @@ export default {
 .active {
     border-bottom: 4px solid #FA2;
     padding-bottom: 8px;
-}</style>
+}
+</style>
