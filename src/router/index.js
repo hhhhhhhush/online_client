@@ -12,8 +12,13 @@ const router = new VueRouter({
     { path: '/', component: () => import('@/views/LoginPage.vue'), redirect: '/login', },
     { path: '/login', component: () => import('@/views/LoginPage.vue') },
     {
-      path: '/home', component: () => import('@/views/HomePage.vue'), children: [
-        { path: '/home/personal', component: () => import('@/views/children/PersonalPage.vue') }
+      path: '/home', component: () => import('@/views/HomePage.vue'), redirect: '/home/first',children: [
+        { path: '/home/personal', component: () => import('@/views/children/PersonalPage.vue') },
+        { path: '/home/first', component: () => import('@/views/children/FirstPage.vue') },
+        { path: '/home/total', component: () => import('@/views/children/TotalPage.vue') },
+        { path: '/home/school', component: () => import('@/views/children/SchoolPage.vue') },
+        { path: '/home/skill', component: () => import('@/views/children/SkillPage.vue') },
+        { path: '/home/activity', component: () => import('@/views/children/ActivityPage.vue') },
       ]
     },
   ]

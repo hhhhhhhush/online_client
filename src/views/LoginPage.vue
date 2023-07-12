@@ -24,27 +24,30 @@
             </div>
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" v-if="showPanel">
                 <el-form-item label="请输入手机号" prop="username">
-                    <el-input v-model="ruleForm.username" placeholder="请输入手机号"></el-input>
+                    <el-input v-model="ruleForm.username" placeholder="请输入手机号" autofocus maxlength="11"></el-input>
                 </el-form-item>
                 <el-form-item label="请输入密码" prop="password">
-                    <el-input type="password" v-model="ruleForm.password" placeholder="密码由字母数字下划线组成"></el-input>
+                    <el-input type="password" v-model="ruleForm.password" placeholder="密码由字母数字下划线组成"
+                        @keyup.enter.native='toHome' show-password></el-input>
                 </el-form-item>
                 <el-button plain class="loginBtn" @click="toHome">登录</el-button>
             </el-form>
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" v-else>
                 <el-form-item label="请输入手机号" prop="phone"><br>
-                    <el-input v-model="ruleForm.phone" placeholder="请输入11位手机号"></el-input>
+                    <el-input v-model="ruleForm.phone" placeholder="请输入11位手机号" maxlength="11"></el-input>
                 </el-form-item>
                 <el-form-item label="请输入验证码" prop="verify"><br>
-                    <el-input v-model="ruleForm.verify" placeholder="请输入验证码" class="mobileInput"></el-input>
+                    <el-input v-model="ruleForm.verify" placeholder="请输入验证码" class="mobileInput" maxlength="5"></el-input>
                     <span class="verify" @click="startCountdown" v-if="!isCounting">获取验证码</span>
                     <span class="verify" v-else>{{ countdown }}s 后重置</span>
                 </el-form-item>
                 <el-form-item label="请输入密码" prop="password"><br>
-                    <el-input type="password" v-model="ruleForm.password" placeholder="密码由字母数字下划线组成"></el-input>
+                    <el-input type="password" v-model="ruleForm.password" placeholder="密码由字母数字下划线组成"
+                        show-password></el-input>
                 </el-form-item>
                 <el-form-item label="请确认密码" prop="password2"><br>
-                    <el-input type="password" v-model="ruleForm.password2" placeholder="密码由字母数字下划线组成"></el-input>
+                    <el-input type="password" v-model="ruleForm.password2" placeholder="密码由字母数字下划线组成"
+                        show-password></el-input>
                 </el-form-item>
                 <el-button plain class="loginBtn" @click="toRegister">注册</el-button>
             </el-form>
@@ -67,6 +70,7 @@ export default {
             countdown: 0, // 倒计时秒数
             isCounting: false, // 是否正在倒计时,
             showQRCode: false, // 控制二维码图片的显示与隐藏
+            userAavatar: "https://preview.qiantucdn.com/58pic/20220311/00M58PICeYaWsZ1WF84MN_PIC2018_PIC2018.jpg%21w290_290",
             ruleForm: {
                 username: '',
                 password: '',
@@ -117,32 +121,49 @@ export default {
                 this.phone = this.ruleForm.username
             }
             console.log(this.ruleForm.username, this.ruleForm.password)
-            const res = await axios.post(`http://localhost:3000/user/login`, {
-                username: this.ruleForm.username,
-                password: this.ruleForm.password,
-                phone: this.phone
-            })
-            const data = res.data;
-            if (res.data.code === 200) {
-                // 将数据传递给vuex vuex刷新数据会消失，Vuex 中的状态是存储在内存中的，而不是持久化存储。
-                this.setUser(data.data)
-                // 把数据给本地存储
-                localStorage.setItem('userInfo', JSON.stringify(data.data));
-                router.push('/home')
-                // console.log(data.data)
-                this.$message({
-                    message: "欢迎回来" + data.data.username + "~",
-                    type: 'success',
-                    duration: 2000,
-                    center: true,
-                    showClose: true,
-                    offset: 80
-                });
-
+            if (this.phone.length == 11) {
+                const res = await axios.post(`http://localhost:3000/user/login`, {
+                    password: this.ruleForm.password,
+                    phone: this.phone
+                })
+                const data = res.data;
+                // 判断数据库内有无头像，没有就用默认头像
+                if (data.code == 200) {
+                    if (data.data.avatar == '') {
+                        // console.log(this.userAavatar)
+                        // console.log(data.data.id)
+                        const userId = data.data.id
+                        data.data.avatar = this.userAavatar;
+                        const res = await axios.put(`http://localhost:3000/user/update/avatar/${userId}`, {
+                            avatarUrl: this.userAavatar
+                        })
+                        // console.log(res)
+                    }
+                }
+                console.log(data)
+                if (res.data.code === 200) {
+                    // 将数据传递给vuex vuex刷新数据会消失，Vuex 中的状态是存储在内存中的，而不是持久化存储。
+                    this.setUser(data.data)
+                    // 把数据给本地存储
+                    localStorage.setItem('userInfo', JSON.stringify(data.data));
+                    // console.log(res.data.data.id)
+                    // const id = res.data.data.id
+                    router.push({
+                        path: '/home',
+                        query: {
+                            userId: res.data.data.id
+                        }
+                    })
+                    // console.log(data.data)
+                }
+                else {
+                    this.$message.error(data.msg);
+                }
             }
             else {
-                this.$message.error(data.msg);
+                this.$message.error("手机号为11位哦")
             }
+
         },
         // 验证码功能实现
         startCountdown() {
@@ -170,7 +191,7 @@ export default {
                 })
                 var regRes = res;
             }
-            else if (this.ruleForm.password != this.ruleForm.password2) {
+            else if ((this.ruleForm.password != this.ruleForm.password2) || (this.ruleForm.password == null)) {
                 this.$message.error("两次输入密码不一致哦")
                 return
             }
@@ -185,9 +206,14 @@ export default {
                 // this.showPanel = true;
                 // this.activeTab = 'login';
                 // this.$refs.ruleForm.resetFields();
-                this.$alert('请返回登录界面噢~', '注册成功啦~', {
-                    confirmButtonText: '确定',
-                })
+                const h = this.$createElement;
+                this.$notify({
+                    title: '注册成功啦',
+                    message: h('i', { style: 'color: #fa2' }, '请点击Login按钮，重新登录吧~'),
+                    offset: 90,
+                    duration: 2000,
+                    type: 'success'
+                });
             } else {
                 // 其他状态码处理
                 if (this.ruleForm.verify.length != 5) {
@@ -196,7 +222,7 @@ export default {
                 }
                 this.$message.error(regRes.data.msg);
             }
-        }
+        },
     }
 }
 </script>

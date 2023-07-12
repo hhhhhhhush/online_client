@@ -13,8 +13,18 @@ export default new Vuex.Store({
     setUser(state, user) { // 更新用户信息的 mutation
       state.userInfo = user;
     },
+    // 更新用户信息的 mutation
+    updateUserInfo(state, userInfo) {
+      state.userInfo = userInfo;
+    },
+    updateData(state, newData) {
+      state.userInfo = newData;
+    },
   },
   actions: {
+    updateDataAction({ commit }, newData) {
+      commit('updateData', newData);
+    },
   },
   modules: {
   }
