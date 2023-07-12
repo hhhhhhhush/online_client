@@ -16,7 +16,7 @@ const router = new VueRouter({
         { path: '/home/personal', component: () => import('@/views/children/PersonalPage.vue') },
         { path: '/home/first', component: () => import('@/views/children/FirstPage.vue') },
         { path: '/home/total', component: () => import('@/views/children/TotalPage.vue') },
-        { path: '/home/school', component: () => import('@/views/children/SchoolPage.vue') },
+        { path: '/home/doit', component: () => import('@/views/children/DoIt.vue') },
         { path: '/home/skill', component: () => import('@/views/children/SkillPage.vue') },
         { path: '/home/activity', component: () => import('@/views/children/ActivityPage.vue') },
       ]

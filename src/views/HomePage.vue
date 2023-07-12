@@ -11,7 +11,8 @@
                 </div>
                 <div class="center">
                     <ul>
-                        <li @click="toMenu(menu.href,index)" v-for="(menu,index) in menus" :key="menu.id" :class="{ active: activeIndex === index }">
+                        <li @click="toMenu(menu.href, index)" v-for="(menu, index) in menus" :key="menu.id"
+                            :class="{ active: activeIndex === index }">
                             {{ menu.name }}
                         </li>
                     </ul>
@@ -46,8 +47,8 @@ export default {
             menus: [
                 { id: 1, href: "/home/first", name: "首页" },
                 { id: 2, href: "/home/total", name: "全部课程" },
-                { id: 3, href: "/home/school", name: "学校" },
-                { id: 4, href: "/home/skill", name: "技能" },
+                { id: 3, href: "/home/skill", name: "技能" },
+                { id: 4, href: "/home/doit", name: "实战" },
                 { id: 5, href: "/home/activity", name: "活动" },
             ],
             activeIndex: 0,
@@ -94,7 +95,7 @@ export default {
                 }
             })
         },
-        toMenu(href,index) {
+        toMenu(href, index) {
             this.activeIndex = index;
             router.push(href)
         },
@@ -182,7 +183,8 @@ export default {
     font-size: 13px;
     font-weight: bold;
 }
+
 .active {
     color: #fa2;
-  }
+}
 </style>
