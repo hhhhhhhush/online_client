@@ -19,6 +19,7 @@ const router = new VueRouter({
         { path: '/home/doit', component: () => import('@/views/children/DoIt.vue') },
         { path: '/home/skill', component: () => import('@/views/children/SkillPage.vue') },
         { path: '/home/activity', component: () => import('@/views/children/ActivityPage.vue') },
+        { path: '/home/coursedetail', component: () => import('@/views/children/CourseDetail') },
       ]
     },
   ]

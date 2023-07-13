@@ -32,6 +32,10 @@
             </nav>
         </article>
         <router-view></router-view>
+        <el-backtop :bottom="100" :right="100">
+            <div class="custom-backtop">回到顶部</div>
+        </el-backtop>
+        <footer>Copyright© 2023 youyu.com  <img src="../images/beianicon.png" alt="">京ICP备 12003892号-11 京公网安备11010802030151号 营业执照</footer>
     </div>
 </template>
 
@@ -107,6 +111,7 @@ export default {
 .headerBox {
     width: 100%;
     border-bottom: 1px solid #f3f3f3;
+    overflow: hidden;
 }
 
 .headerContent {
@@ -186,5 +191,20 @@ export default {
 
 .active {
     color: #fa2;
+}
+footer {
+    width: 100%;
+    text-align: center;
+    color: #93999F;
+    font-size: 14px;
+    height: 30px;
+    line-height: 30px;
+    padding: 20px 0;
+}
+.custom-backtop {
+    background-color: #f56c6c;
+    color: #fff;
+    border-radius: 4px;
+    padding: 10px;
 }
 </style>

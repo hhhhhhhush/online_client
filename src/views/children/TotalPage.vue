@@ -5,8 +5,12 @@
 </template>
 
 <script>
+import router from 'vue-router'
     export default {
-        name:"total"
+        name:"total",
+        mounted() {
+           console.log(this.$route.query.courseId)
+        }
     }
 </script>
 
