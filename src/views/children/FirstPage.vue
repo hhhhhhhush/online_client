@@ -100,6 +100,7 @@ export default {
         return {
             imgsInfo: null,
             courseInfo: null,
+            userId:null,
             rankInfo: null,
             more: [
                 "https://static001.geekbang.org/resource/image/18/34/1878a1c02cd4yy31f48f6226b8ebe934.png?x-oss-process=image/resize,w_282,h_159/format,webp",

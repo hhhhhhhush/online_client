@@ -149,7 +149,7 @@ export default {
                     // console.log(res.data.data.id)
                     // const id = res.data.data.id
                     router.push({
-                        path: '/home',
+                        path: '/home/first',
                         query: {
                             userId: res.data.data.id
                         }

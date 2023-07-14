@@ -202,7 +202,7 @@ footer {
     padding: 20px 0;
 }
 .custom-backtop {
-    background-color: #f56c6c;
+    background-color: #fa2;
     color: #fff;
     border-radius: 4px;
     padding: 10px;

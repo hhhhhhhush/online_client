@@ -40,23 +40,29 @@
 
             <!-- 课程评价 -->
             <h3 class="evaluate">课程评价</h3>
+            <template v-if="course.reviews.length === 0">
+                <p class="reviewNone">此课程暂无评价哦~</p>
+              </template>
             <el-card v-for="review in course.reviews" :key="review.id" class="review-card">
+                <div class="review-header">
+                    <img class="avatar" :src="review.avatar" alt="用户头像">
+                    <p class="username">{{ review.user }}</p>
+                </div>
                 <p>评分：{{ review.rating }}</p>
                 <p>{{ review.comment }}</p>
-                <p>用户：{{ review.user }}</p>
             </el-card>
 
             <!-- 添加评价表单 -->
             <h3>添加评价</h3>
-            <el-form @submit.native.prevent="submitReview" class="add-review-form">
+            <el-form class="add-review-form">
                 <el-form-item label="评分">
-                    <el-rate v-model="newReview.rating" :max="5" show-text></el-rate>
+                    <el-rate v-model.number="newReview.rating" :max="5" show-text></el-rate>
                 </el-form-item>
                 <el-form-item label="评论">
                     <el-input v-model="newReview.comment" type="textarea" rows="4"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" native-type="submit">提交评价</el-button>
+                    <el-button type="primary" native-type="submit" @click.prevent="submitReview" style="background-color: #fa2; border-color: #fa2;">提交评价</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -66,20 +72,21 @@
 <script>
 import axios from 'axios'
 import router from '@/router/index'
+import { mapState } from 'vuex';
 export default {
     data() {
         return {
             course: {
                 reviews: [
-                    { id: 1, rating: 5, comment: '很棒的课程！', user: '张三' },
-                    { id: 2, rating: 4, comment: '内容很好。', user: '李四' },
+                    { id: 1, rating: 5, comment: '很棒的课程！', user: '流川枫',avatar:"https://img1.baidu.com/it/u=155159250,1032474525&fm=253&fmt=auto&app=138&f=JPEG?w=502&h=500" },
                     // 添加更多评价...
                 ],
             },
             newReview: {
-                rating: '',
+                rating: 0,
                 comment: '',
             },
+            // 老师头像
             tavatar: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fc-ssl.duitang.com%2Fuploads%2Fitem%2F201509%2F19%2F20150919190730_XWsBG.thumb.1000_0.jpeg&refer=http%3A%2F%2Fc-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1691846063&t=a471e76e6b87f219d3a50ec3eebc355e",
             courseId: null,
             courseInfo: null,
@@ -90,6 +97,13 @@ export default {
         const resCourse = await axios.get(`http://localhost:3000/course/courseone/${this.courseId}`)
         console.log(resCourse.data.data)
         this.courseInfo = resCourse.data.data
+        // console.log(this.userInfo.id)
+        const CourseReviews = await axios.get(`http://localhost:3000/review/courses/${this.courseId}/reviews`)
+        this.course.reviews = CourseReviews.data.data;
+        console.log(CourseReviews)
+    },
+    computed: {
+        ...mapState(['userInfo'])
     },
     methods: {
         // 加入购物车逻辑
@@ -99,13 +113,29 @@ export default {
             // 示例：显示一个消息提示
             this.$message.success('已加入购物车');
         },
-        submitReview() {
+        async submitReview() {
             // 添加提交评价的逻辑，可以将新评价发送给服务器或更新评价列表
+            const reviews = await axios.post(`http://localhost:3000/review/commit`,{
+                course_id: this.courseId,
+                user_id: this.userInfo.id, //从vuex中获取当前用户的id
+                rating: this.newReview.rating,
+                comment: this.newReview.comment
+            })
             // 可以通过 this.newReview 访问新评价的数据
-            console.log('提交评价：', this.newReview);
+
+            // 添加新的评价到评价列表
+            const newReview = {
+                rating: Number(this.newReview.rating),
+                comment: this.newReview.comment,
+                user: this.userInfo.username, //vuex中的名称 也就是当前登录的用户
+                avatar: this.userInfo.avatar //当前登录用户的头像
+            };
+            // 在之前的数组后面追加新的评论相关数据
+            this.course.reviews.push(newReview);
             // 重置表单
             this.newReview.rating = '';
             this.newReview.comment = '';
+
         },
     }
 }
@@ -304,12 +334,15 @@ export default {
     margin-left: 20px;
     font-size: 18px;
 }
+
 h3 {
     color: #333;
 }
+
 .evaluate {
     margin-top: 30px;
 }
+
 .review-card {
     margin-bottom: 10px;
     margin-top: 10px;
@@ -321,6 +354,19 @@ h3 {
 .add-review-form {
     margin-top: 20px;
 }
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
 
+.username {
+    font-weight: bold;
+}
+.reviewNone {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
 </style>
   
