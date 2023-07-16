@@ -81,7 +81,7 @@ export default {
             rules: {
                 username: [
                     { required: true, message: '请输入手机号', trigger: 'blur' },
-                    { min: 11, max: 11, message: '请输入11位手机号', trigger: ['blur', 'change'] }
+                    { pattern: /^(?:(?:\+|00)86)?1(?:(?:3[\d])|(?:4[5-79])|(?:5[0-35-9])|(?:6[5-7])|(?:7[0-8])|(?:8[\d])|(?:9[1589]))\d{8}$/, message: '手机号格式错误!', trigger: 'blur' }
                 ],
                 password: [
                     { required: true, message: '请输入密码', trigger: 'blur' },
@@ -93,7 +93,7 @@ export default {
                 ],
                 phone: [
                     { required: true, message: '请输入11位手机号', trigger: 'blur' },
-                    { min: 11, max: 11, message: '手机号必须为11位', trigger: ['blur', 'change'] }
+                    { pattern: /^(?:(?:\+|00)86)?1(?:(?:3[\d])|(?:4[5-79])|(?:5[0-35-9])|(?:6[5-7])|(?:7[0-8])|(?:8[\d])|(?:9[1589]))\d{8}$/, message: '手机号格式错误!', trigger: ['blur', 'change'] }
                 ],
                 verify: [
                     { required: true, message: '请输入验证码', trigger: 'blur' },

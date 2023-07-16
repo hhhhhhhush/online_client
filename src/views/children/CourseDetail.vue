@@ -108,10 +108,7 @@ export default {
     methods: {
         // 加入购物车逻辑
         addToCart() {
-            // 执行加入购物车的操作，可以将课程信息发送给后端进行处理
-            console.log('加入购物车', this.course);
-            // 示例：显示一个消息提示
-            this.$message.success('已加入购物车');
+
         },
         async submitReview() {
             // 添加提交评价的逻辑，可以将新评价发送给服务器或更新评价列表

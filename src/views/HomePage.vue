@@ -18,6 +18,9 @@
                     </ul>
                 </div>
                 <div class="right" v-if="userInfo">
+                    <span class="el-icon-shopping-cart-2 shopCar" @click="toShopCar">
+                        <span class="carNum">12</span>
+                    </span>
                     <el-avatar :size="26" :src="userInfo.avatar"></el-avatar>
                     <span @click="personal">
                         {{ userInfo.username }}
@@ -35,7 +38,8 @@
         <el-backtop :bottom="100" :right="100">
             <div class="custom-backtop">回到顶部</div>
         </el-backtop>
-        <footer>Copyright© 2023 youyu.com  <img src="../images/beianicon.png" alt="">京ICP备 12003892号-11 京公网安备11010802030151号 营业执照</footer>
+        <footer>Copyright© 2023 youyu.com <img src="../images/beianicon.png" alt="">京ICP备 12003892号-11 京公网安备11010802030151号
+            营业执照</footer>
     </div>
 </template>
 
@@ -103,6 +107,10 @@ export default {
             this.activeIndex = index;
             router.push(href)
         },
+        // 跳转购物车页面
+        toShopCar() {
+            router.push('/home/shopcar')
+        }
     }
 }
 </script>
@@ -152,7 +160,7 @@ export default {
 }
 
 .headerContent .right>span {
-    margin-left: 10px;
+    margin-left: 20px;
 }
 
 .headerContent .right>span:hover {
@@ -192,6 +200,7 @@ export default {
 .active {
     color: #fa2;
 }
+
 footer {
     width: 100%;
     text-align: center;
@@ -201,10 +210,25 @@ footer {
     line-height: 30px;
     padding: 20px 0;
 }
+
 .custom-backtop {
     background-color: #fa2;
     color: #fff;
     border-radius: 4px;
     padding: 10px;
 }
-</style>
+
+.shopCar {
+    font-size: 30px;
+    position: relative;
+}
+
+.carNum {
+    font-size: 12px;
+    display: inline-block;
+    position: absolute;
+    color: #fa2;
+    font-weight: bold;
+    top: -6px;
+    left: 26px;
+}</style>
