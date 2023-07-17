@@ -21,7 +21,7 @@
                         <p><span>综合评分:</span> 5</p>
                     </div>
                 </div>
-                <button class="add-to-cart-btn" @click="addToCart">加入购物车</button>
+                <button class="add-to-cart-btn" @click="addCart">加入购物车</button>
             </div>
             <div class="description">
                 <div class="teachAvatar">
@@ -42,7 +42,7 @@
             <h3 class="evaluate">课程评价</h3>
             <template v-if="course.reviews.length === 0">
                 <p class="reviewNone">此课程暂无评价哦~</p>
-              </template>
+            </template>
             <el-card v-for="review in course.reviews" :key="review.id" class="review-card">
                 <div class="review-header">
                     <img class="avatar" :src="review.avatar" alt="用户头像">
@@ -62,7 +62,8 @@
                     <el-input v-model="newReview.comment" type="textarea" rows="4"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" native-type="submit" @click.prevent="submitReview" style="background-color: #fa2; border-color: #fa2;">提交评价</el-button>
+                    <el-button type="primary" native-type="submit" @click.prevent="submitReview"
+                        style="background-color: #fa2; border-color: #fa2;">提交评价</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -72,13 +73,13 @@
 <script>
 import axios from 'axios'
 import router from '@/router/index'
-import { mapState } from 'vuex';
+import { mapMutations, mapState } from 'vuex';
 export default {
     data() {
         return {
             course: {
                 reviews: [
-                    { id: 1, rating: 5, comment: '很棒的课程！', user: '流川枫',avatar:"https://img1.baidu.com/it/u=155159250,1032474525&fm=253&fmt=auto&app=138&f=JPEG?w=502&h=500" },
+                    { id: 1, rating: 5, comment: '很棒的课程！', user: '流川枫', avatar: "https://img1.baidu.com/it/u=155159250,1032474525&fm=253&fmt=auto&app=138&f=JPEG?w=502&h=500" },
                     // 添加更多评价...
                 ],
             },
@@ -103,16 +104,36 @@ export default {
         console.log(CourseReviews)
     },
     computed: {
-        ...mapState(['userInfo'])
+        ...mapState(['userInfo','shopcarInfo'])
     },
     methods: {
+        ...mapMutations(['addToCart']),
         // 加入购物车逻辑
-        addToCart() {
-
+        addCart() {
+            console.log(this.courseInfo)
+            // 解构出需要的数据
+            const { cover_image, id, price, description } = this.courseInfo
+            const carItem = {
+                cover_image,
+                id,
+                price,
+                description,
+                quantity: 1, //默认数量为1，后续可以在购物车中添加
+            }
+            console.log(carItem)
+            // 添加到vuex中
+            const existingProduct = this.shopcarInfo.find(item => item.id === carItem.id);
+            if (existingProduct) {
+                // 购物车已存在相同商品，数量加1
+                this.updateCartItem(existingProduct);
+            } else {
+                // 购物车不存在相同商品，添加到购物车
+                this.addToCart(carItem);
+            }
         },
         async submitReview() {
             // 添加提交评价的逻辑，可以将新评价发送给服务器或更新评价列表
-            const reviews = await axios.post(`http://localhost:3000/review/commit`,{
+            const reviews = await axios.post(`http://localhost:3000/review/commit`, {
                 course_id: this.courseId,
                 user_id: this.userInfo.id, //从vuex中获取当前用户的id
                 rating: this.newReview.rating,
@@ -351,6 +372,7 @@ h3 {
 .add-review-form {
     margin-top: 20px;
 }
+
 .avatar {
     width: 40px;
     height: 40px;
@@ -361,6 +383,7 @@ h3 {
 .username {
     font-weight: bold;
 }
+
 .reviewNone {
     margin-top: 20px;
     margin-bottom: 20px;

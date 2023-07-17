@@ -6,7 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     userInfo: null,
-    shopcarInfo: null
+    shopcarInfo: []
   },
   getters: {
   },
@@ -20,6 +20,22 @@ export default new Vuex.Store({
     },
     updateData(state, newData) {
       state.userInfo = newData;
+    },
+    // 购物车信息
+    addToCart(state, item) {
+      const { id } = item;
+      if (state.shopcarInfo[id]) {
+        // 商品已存在，增加数量
+        state.shopcarInfo[id].quantity += 1;
+      } else {
+        // 商品不存在，添加到购物车
+        state.shopcarInfo[id] = { ...item, quantity: 1 };
+      }
+    },
+    updateCartItem(state, { id, quantity }) {
+      if (state.shopcarInfo[id]) {
+        state.shopcarInfo[id].quantity = quantity;
+      }
     },
   },
   actions: {

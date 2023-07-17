@@ -19,7 +19,7 @@
                 </div>
                 <div class="right" v-if="userInfo">
                     <span class="el-icon-shopping-cart-2 shopCar" @click="toShopCar">
-                        <span class="carNum">12</span>
+                        <span class="carNum"> {{ shopcarInfo.length }} </span>
                     </span>
                     <el-avatar :size="26" :src="userInfo.avatar"></el-avatar>
                     <span @click="personal">
@@ -69,7 +69,7 @@ export default {
         // console.log(this.userId);
     },
     computed: {
-        ...mapState(['userInfo'])
+        ...mapState(['userInfo','shopcarInfo'])
     },
     methods: {
         reLogin() {
