@@ -91,26 +91,34 @@ export default {
             tavatar: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fc-ssl.duitang.com%2Fuploads%2Fitem%2F201509%2F19%2F20150919190730_XWsBG.thumb.1000_0.jpeg&refer=http%3A%2F%2Fc-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1691846063&t=a471e76e6b87f219d3a50ec3eebc355e",
             courseId: null,
             courseInfo: null,
+            sqlCourseInfo: null,  //数据库中当前用户课程数据
         };
     },
     async mounted() {
         this.courseId = this.$route.query.courseId
+        // 获取课程
         const resCourse = await axios.get(`http://localhost:3000/course/courseone/${this.courseId}`)
         console.log(resCourse.data.data)
         this.courseInfo = resCourse.data.data
         // console.log(this.userInfo.id)
+        // 获取评论
         const CourseReviews = await axios.get(`http://localhost:3000/review/courses/${this.courseId}/reviews`)
         this.course.reviews = CourseReviews.data.data;
         console.log(CourseReviews)
+
+        // 获取购物车数据
+        const CarRes = await axios.get(`http://localhost:3000/cart/${this.userInfo.id}`)
+        console.log(CarRes.data.data)
+        this.sqlCourseInfo = CarRes.data.data
     },
     computed: {
-        ...mapState(['userInfo','shopcarInfo'])
+        ...mapState(['userInfo', 'shopcarInfo'])
     },
     methods: {
         ...mapMutations(['addToCart']),
         // 加入购物车逻辑
-        addCart() {
-            console.log(this.courseInfo)
+        async addCart() {
+            // console.log(this.courseInfo)
             // 解构出需要的数据
             const { cover_image, id, price, description } = this.courseInfo
             const carItem = {
@@ -120,16 +128,24 @@ export default {
                 description,
                 quantity: 1, //默认数量为1，后续可以在购物车中添加
             }
-            console.log(carItem)
             // 添加到vuex中
-            const existingProduct = this.shopcarInfo.find(item => item.id === carItem.id);
-            if (existingProduct) {
-                // 购物车已存在相同商品，数量加1
-                this.updateCartItem(existingProduct);
-            } else {
-                // 购物车不存在相同商品，添加到购物车
-                this.addToCart(carItem);
+            this.addToCart(carItem)
+            // 添加到数据库中
+            // 将数据库中的课程id和当前的课程id对比，如果一样则不再添加（表示数据库中已有这个课程）
+            if( this.sqlCourseInfo.course_id==null ) {
+                const addCartSql = await axios.post(`http://localhost:3000/cart/add`, {
+                    user_id: this.userInfo.id,
+                    course_id: this.courseInfo.id,
+                    quantity: 1
+                })
+                console.log(addCartSql)
             }
+            // const existId = this.sqlCourseInfo.find(course => course.course_id === this.courseInfo.id);
+            // console.log(existId.course_id)
+            // console.log(this.courseInfo.id)
+            // if (existId.course_id == null) {
+                
+            // }
         },
         async submitReview() {
             // 添加提交评价的逻辑，可以将新评价发送给服务器或更新评价列表

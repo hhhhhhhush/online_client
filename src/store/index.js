@@ -23,19 +23,15 @@ export default new Vuex.Store({
     },
     // 购物车信息
     addToCart(state, item) {
-      const { id } = item;
-      if (state.shopcarInfo[id]) {
-        // 商品已存在，增加数量
-        state.shopcarInfo[id].quantity += 1;
+      const existId = state.shopcarInfo.find(course => course.id === item.id);
+      if( existId ) {
+        console.log(existId)
+        // console.log(state.shopcarInfo)
+        existId.quantity += 1
       } else {
-        // 商品不存在，添加到购物车
-        state.shopcarInfo[id] = { ...item, quantity: 1 };
+        state.shopcarInfo.push(item)
       }
-    },
-    updateCartItem(state, { id, quantity }) {
-      if (state.shopcarInfo[id]) {
-        state.shopcarInfo[id].quantity = quantity;
-      }
+
     },
   },
   actions: {
