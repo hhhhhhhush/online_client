@@ -6,7 +6,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     userInfo: null,
-    shopcarInfo: []
+    shopcarInfo: [],
+    totalLength:null
   },
   getters: {
   },
@@ -25,14 +26,18 @@ export default new Vuex.Store({
     addToCart(state, item) {
       const existId = state.shopcarInfo.find(course => course.id === item.id);
       if( existId ) {
-        console.log(existId)
+        // console.log(existId)
         // console.log(state.shopcarInfo)
         existId.quantity += 1
       } else {
         state.shopcarInfo.push(item)
       }
-
     },
+    // 购物车用户数据总长度
+    setTotalLength(state,length) {
+      state.totalLength = length;
+      console.log(state.totalLength)
+    }
   },
   actions: {
     updateDataAction({ commit }, newData) {

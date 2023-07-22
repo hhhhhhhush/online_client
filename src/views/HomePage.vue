@@ -19,7 +19,7 @@
                 </div>
                 <div class="right" v-if="userInfo">
                     <span class="el-icon-shopping-cart-2 shopCar" @click="toShopCar">
-                        <span class="carNum"> {{ shopcarInfo.length }} </span>
+                        <span class="carNum"> {{ this.sqlCourseInfo.length }} </span>
                     </span>
                     <el-avatar :size="26" :src="userInfo.avatar"></el-avatar>
                     <span @click="personal">
@@ -60,18 +60,33 @@ export default {
                 { id: 5, href: "/home/activity", name: "活动" },
             ],
             activeIndex: 0,
+            courseInfo: null,
+            sqlCourseInfo: null,
         }
     },
     async mounted() {
         const courseRes = await axios.get(`http://localhost:3000/course/courselist`)
         console.log(courseRes)
         this.userId = this.$route.query.userId;
-        // console.log(this.userId);
+
+        // 判断this.userInfo是否有值，如果有再获取购物车数据
+        if (this.userInfo) {
+            // 获取当前登录用户的购物车数据
+            this.getSqlInfo();
+        }
     },
     computed: {
-        ...mapState(['userInfo','shopcarInfo'])
+        ...mapState(['userInfo', 'shopcarInfo', 'totalLength'])
     },
     methods: {
+        // 添加购物车之前判断，数据库中是否存在当前课程
+        async getSqlInfo() {
+            const CarRes = await axios.get(`http://localhost:3000/cart/${this.userInfo.id}`)
+            console.log(CarRes.data.data)
+            // 赋值给sql信息
+            this.sqlCourseInfo = CarRes.data.data
+            console.log(this.sqlCourseInfo)
+        },
         reLogin() {
             router.push("/login")
         },
@@ -231,4 +246,5 @@ footer {
     font-weight: bold;
     top: -6px;
     left: 26px;
-}</style>
+}
+</style>

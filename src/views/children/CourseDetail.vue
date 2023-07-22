@@ -91,7 +91,8 @@ export default {
             tavatar: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fc-ssl.duitang.com%2Fuploads%2Fitem%2F201509%2F19%2F20150919190730_XWsBG.thumb.1000_0.jpeg&refer=http%3A%2F%2Fc-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1691846063&t=a471e76e6b87f219d3a50ec3eebc355e",
             courseId: null,
             courseInfo: null,
-            sqlCourseInfo: null,  //数据库中当前用户课程数据
+            sqlCourseInfo: null,  //数据库中当前用户课程数据,
+            totalLength:null //当前用户在数据库购物车数据表中的数据长度
         };
     },
     async mounted() {
@@ -106,46 +107,86 @@ export default {
         this.course.reviews = CourseReviews.data.data;
         console.log(CourseReviews)
 
-        // 获取购物车数据
-        const CarRes = await axios.get(`http://localhost:3000/cart/${this.userInfo.id}`)
-        console.log(CarRes.data.data)
-        this.sqlCourseInfo = CarRes.data.data
+        // 获取当前登录用户的购物车数据
+        this.getSqlInfo()
+
     },
     computed: {
         ...mapState(['userInfo', 'shopcarInfo'])
     },
     methods: {
         ...mapMutations(['addToCart']),
+        // 添加购物车之前判断，数据库中是否存在当前课程
+        async getSqlInfo() {
+            const CarRes = await axios.get(`http://localhost:3000/cart/${this.userInfo.id}`)
+            console.log(CarRes.data.data)
+            // 赋值给sql信息
+            this.sqlCourseInfo = CarRes.data.data
+            this.totalLength = this.sqlCourseInfo.length; // 将获取的数据长度赋值给 totalLength
+            // 将长度赋值给vuex中的totalLength
+            this.$store.commit('setTotalLength',this.totalLength)
+        },
         // 加入购物车逻辑
         async addCart() {
-            // console.log(this.courseInfo)
-            // 解构出需要的数据
-            const { cover_image, id, price, description } = this.courseInfo
+            const { cover_image, id, price, description } = this.courseInfo;
             const carItem = {
                 cover_image,
                 id,
                 price,
                 description,
-                quantity: 1, //默认数量为1，后续可以在购物车中添加
+                quantity: 1,
+            };
+
+            // 获取当前用户在数据库中的购物数据
+            this.getSqlInfo(() => {
+                const foundId = this.sqlCourseInfo.find(item => item.course_id === this.courseInfo.id);
+                if (foundId) {
+                    this.$message.error({
+                        message:"请勿重复添加哦~",
+                        duration:1000
+                    });
+                } else {
+                    // 添加到数据库
+                    axios.post(`http://localhost:3000/cart/add`, {
+                        user_id: this.userInfo.id,
+                        course_id: this.courseInfo.id,
+                        quantity: 1,
+                        selected: 0,
+                        cover_image: this.courseInfo.cover_image,
+                        price: this.courseInfo.price,
+                        description: this.courseInfo.description
+
+                    }).then(() => {
+                        this.$message.success({
+                            message:"商品添加成功~",
+                            duration:1000
+                        })
+                    }).catch(error => {
+                        console.error(error);
+                        this.$message.error({
+                            message:"添加商品失败",
+                            duration:1000
+                        });
+                        
+                    })
+                }
+            });
+
+            this.addToCart(carItem);
+            this.getSqlInfo();
+        },
+
+        async getSqlInfo(callback) {
+            try {
+                const CarRes = await axios.get(`http://localhost:3000/cart/${this.userInfo.id}`);
+                this.sqlCourseInfo = CarRes.data.data;
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            } catch (error) {
+                console.error(error);
+                this.$message.error("获取数据库数据失败");
             }
-            // 添加到vuex中
-            this.addToCart(carItem)
-            // 添加到数据库中
-            // 将数据库中的课程id和当前的课程id对比，如果一样则不再添加（表示数据库中已有这个课程）
-            if( this.sqlCourseInfo.course_id==null ) {
-                const addCartSql = await axios.post(`http://localhost:3000/cart/add`, {
-                    user_id: this.userInfo.id,
-                    course_id: this.courseInfo.id,
-                    quantity: 1
-                })
-                console.log(addCartSql)
-            }
-            // const existId = this.sqlCourseInfo.find(course => course.course_id === this.courseInfo.id);
-            // console.log(existId.course_id)
-            // console.log(this.courseInfo.id)
-            // if (existId.course_id == null) {
-                
-            // }
         },
         async submitReview() {
             // 添加提交评价的逻辑，可以将新评价发送给服务器或更新评价列表
