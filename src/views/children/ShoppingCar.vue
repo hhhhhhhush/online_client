@@ -141,9 +141,6 @@ export default {
         goToTotal() {
             router.push('/home/total')
         },
-        settleCount() {
-            console.log(111)
-        },
         // 显示支付对话框
         showPaymentDialog() {
             this.paymentDialogVisible = true;
@@ -158,8 +155,6 @@ export default {
         confirmPayment() {
             // 当支付完成后，可以关闭支付对话框，跳转到支付成功页面或其他操作
             this.closePaymentDialog();
-            // 例如：
-            // this.$router.push('/payment-success');
         }
 
     }

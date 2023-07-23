@@ -38,7 +38,7 @@
         <el-backtop :bottom="100" :right="100">
             <div class="custom-backtop">回到顶部</div>
         </el-backtop>
-        <footer>Copyright© 2023 youyu.com <img src="../images/beianicon.png" alt="">京ICP备 12003892号-11 京公网安备11010802030151号
+        <footer>Copyright© 2023 youyu.com <img src="../images/beianicon.png" alt="">京ICP备 xxxxxx号-11 京公网安备xxxxxx号
             营业执照</footer>
     </div>
 </template>
@@ -55,7 +55,7 @@ export default {
             menus: [
                 { id: 1, href: "/home/first", name: "首页" },
                 { id: 2, href: "/home/total", name: "全部课程" },
-                { id: 3, href: "/home/skill", name: "技能" },
+                { id: 3, href: "/home/note", name: "学习笔记" },
                 { id: 4, href: "/home/doit", name: "实战" },
                 { id: 5, href: "/home/activity", name: "活动" },
             ],

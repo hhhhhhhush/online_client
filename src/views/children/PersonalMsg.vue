@@ -1,7 +1,7 @@
 <template>
     <div class="personal-message-page">
         <music-player></music-player>
-        <h1>个人消息</h1>
+        <h1>系统消息</h1>
         <!-- 显示个人消息列表 -->
         <div class="message-list">
             <div v-for="message in messages" :key="message.id" class="message-item"
@@ -27,9 +27,9 @@ export default {
     data() {
         return {
             messages: [
-                { id: 1, title: '消息1', content: '这是消息1的内容' },
-                { id: 2, title: '消息2', content: '这是消息2的内容' },
-                { id: 3, title: '消息3', content: '这是消息3的内容' },
+                { id: 1, title: '叮！恭喜你触发了限时奖励！', content: '潜力UP专属额外奖励来啦！截止2023年12月21日 16:11前，完成投稿任务可获得2元现金。' },
+                { id: 2, title: '终于！你的鱿鱼须专属年度报告来了！', content: '2023你最关注的TA是？哪些视频让你N刷不断？又是什么被你刻入了DNA？' },
+                { id: 3, title: '鱿鱼须隐私政策的修订通知', content: '亲爱的用户，根据业务开展的实际情况，鱿鱼须近期更新了《鱿鱼须隐私政策》中的相关内容。你可以前往鱿鱼须客户端【我的-设置-隐私政策-私政策全文】查看更新后的主要提示以及全部内容。' },
                 // 其他消息数据...
             ],
             activeMessageId: null,
@@ -51,7 +51,6 @@ export default {
 </script>
   
 <style>
-/* 样式请根据实际需求自行设计 */
 .personal-message-page {
     max-width: 800px;
     margin: 0 auto;
