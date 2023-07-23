@@ -30,6 +30,10 @@
                     <el-input type="password" v-model="ruleForm.password" placeholder="密码由字母数字下划线组成"
                         @keyup.enter.native='toHome' show-password></el-input>
                 </el-form-item>
+                <div class="pwdManager">
+                    <div class="remember"><input type="checkbox" v-model="rememberPwd"> 记住密码</div>
+                    <span class="forgot">忘记密码?</span>
+                </div>
                 <el-button plain class="loginBtn" @click="toHome">登录</el-button>
             </el-form>
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" v-else>
@@ -69,7 +73,8 @@ export default {
             activeTab: 'login',
             countdown: 0, // 倒计时秒数
             isCounting: false, // 是否正在倒计时,
-            showQRCode: false, // 控制二维码图片的显示与隐藏
+            showQRCode: false, // 控制二维码图片的显示与隐藏,
+            rememberPwd:false, //记住密码功能
             userAavatar: "https://preview.qiantucdn.com/58pic/20220311/00M58PICeYaWsZ1WF84MN_PIC2018_PIC2018.jpg%21w290_290",
             ruleForm: {
                 username: '',
@@ -99,6 +104,29 @@ export default {
                     { required: true, message: '请输入验证码', trigger: 'blur' },
                     { min: 5, max: 5, message: '验证码为5为数字', trigger: 'blur' }
                 ],
+            }
+        }
+    },
+    mounted() {
+        // 页面加载时，检测是否本地存储中是否保存了密码
+        const localUsername = localStorage.getItem('phone')
+        const localPassword = localStorage.getItem('password')
+        if( localUsername&&localPassword ) {
+            this.ruleForm.username = localUsername
+            this.ruleForm.password = localPassword
+            this.rememberPwd = true
+        }
+    },
+    watch: {
+        rememberPwd(newVal,oldVal) {
+            if( newVal ) {
+                // 勾选了记住密码，保存用户名和密码到本地存储
+                localStorage.setItem("phone",this.ruleForm.username)
+                localStorage.setItem("password",this.ruleForm.password)
+            } else {
+                // 取消勾选记住密码，移除本地存储中的用户名和密码
+                localStorage.removeItem("phone")
+                localStorage.removeItem("password")
             }
         }
     },
@@ -366,5 +394,16 @@ export default {
 .active {
     border-bottom: 4px solid #FA2;
     padding-bottom: 8px;
+}
+.pwdManager {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    align-items: center;
+    padding: 0 12px;
+}
+.pwdManager .forgot {
+    color: #0080ff;
+    cursor: pointer;
 }
 </style>

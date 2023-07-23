@@ -21,6 +21,7 @@ const router = new VueRouter({
         { path: '/home/activity', component: () => import('@/views/children/ActivityPage.vue') },
         { path: '/home/coursedetail', component: () => import('@/views/children/CourseDetail') },
         { path: '/home/shopcar', component: () => import('@/views/children/ShoppingCar.vue') },
+        { path: '/home/message', component: () => import('@/views/children/PersonalMsg.vue') },
       ]
     },
   ]

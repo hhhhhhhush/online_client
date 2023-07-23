@@ -26,11 +26,11 @@
                         {{ userInfo.username }}
                     </span>
                     <el-button type="text" @click="exit" class="exit">退出</el-button>
-                    <span>系统消息</span>
+                    <span @click="myMessage">系统消息</span>
                 </div>
                 <div class="right" v-else>
                     <span @click="reLogin">请重新登录</span>
-                    <span>系统消息</span>
+                    <span @click="myMessage">系统消息</span>
                 </div>
             </nav>
         </article>
@@ -125,6 +125,10 @@ export default {
         // 跳转购物车页面
         toShopCar() {
             router.push('/home/shopcar')
+        },
+        // 跳转到个人消息页面
+        myMessage() {
+            router.push('/home/message')
         }
     }
 }

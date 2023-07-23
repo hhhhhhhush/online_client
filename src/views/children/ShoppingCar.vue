@@ -63,7 +63,7 @@
                     </span>
                 </el-dialog>
             </div>
-        </div>  
+        </div>
     </div>
 </template>
   
@@ -71,7 +71,6 @@
 import axios from 'axios';
 import router from '@/router';
 import { mapState } from 'vuex';
-import { MessageBox } from 'element-ui';
 
 export default {
     data() {
@@ -79,6 +78,7 @@ export default {
             selectAll: false,
             sqlCourseInfo: null,
             paymentDialogVisible: false, // 控制支付对话框的显示与隐藏
+            selectedItems: [], //新添加的属性
         };
     },
     mounted() {
@@ -100,7 +100,7 @@ export default {
                 const CarRes = await axios.get(`http://localhost:3000/cart/${this.userInfo.id}`);
                 this.sqlCourseInfo = CarRes.data.data;
                 // 将 cartItems 的值直接赋值为 sqlCourseInfo，保持一个数组
-                this.cartItems = JSON.parse(JSON.stringify(this.sqlCourseInfo));
+                // this.cartItems = JSON.parse(JSON.stringify(this.sqlCourseInfo));
             } catch (error) {
                 console.error(error);
                 this.$message.error("获取数据库数据失败,请查看是否已登录");
@@ -114,19 +114,14 @@ export default {
                 type: 'warning',
             })
                 .then(async () => {
-                    // 用户点击确认按钮，执行删除操作
+                    // 如果当前商品对象的ID与要删除的商品ID不相等，filter方法会将其保留在数组中，否则不保留，从而将要删除的商品过滤掉
                     this.sqlCourseInfo = this.sqlCourseInfo.filter(i => i.id !== item.id);
-                    try {
-                        // 从数据库中删除该商品
-                        await axios.delete(`http://localhost:3000/cart/remove/${item.id}`);
-                        this.$message.success({
-                            message: "商品已成功移除",
-                            duration: 1000
-                        });
-                    } catch (error) {
-                        console.error(error);
-                        this.$message.error("移除商品失败");
-                    }
+                    // 从数据库中删除该商品
+                    await axios.delete(`http://localhost:3000/cart/remove/${item.id}`);
+                    this.$message.success({
+                        message: "商品已成功移除",
+                        duration: 500
+                    });
                 })
                 .catch(() => {
                     // 用户点击取消按钮，取消删除操作
@@ -161,7 +156,6 @@ export default {
 
         // 确认支付
         confirmPayment() {
-            // 在这里可以添加支付的逻辑
             // 当支付完成后，可以关闭支付对话框，跳转到支付成功页面或其他操作
             this.closePaymentDialog();
             // 例如：
@@ -269,13 +263,20 @@ export default {
     border: #fa2;
     color: #fff;
 }
+
 .payment-content {
     text-align: center;
-  }
-  .payment-content img {
+}
+
+.payment-content img {
     width: 270px;
     height: 340px;
     margin-bottom: 10px;
-  }
+}
+
+.el-dialog__header {
+    float: left;
+    margin-bottom: 20px;
+}
 </style>
   
