@@ -8,13 +8,13 @@
         <div v-for="note in notes" :key="note.id" class="note-item">
             <img :src="note.avatar" alt="User Avatar" class="avatar" />
             <div class="note-info">
-                <h3 class="contentTitle" @click="toNoteDetail">{{ note.title }}</h3>
+                <h3 class="contentTitle" @click="toNoteDetail(note.id)">{{ note.title }}</h3>
                 <p>{{ note.content }}</p>
                 <p class="user-info">{{ note.username }} - {{ note.created_at }}</p>
             </div>
             <div class="note-buttons">
-                <button @click="editNote(note.id)" class="note-button">修改</button>
-                <button @click="deleteNote(note.id)" class="note-button">删除</button>
+                <button @click="editNote(note.id)" v-if="isCurrentUser(note.username)" class="note-button">修改</button>
+                <button @click="deleteNote(note.id)" v-if="isCurrentUser(note.username)" class="note-button">删除</button>
             </div>
         </div>
     </div>
@@ -23,55 +23,79 @@
 <script>
 import axios from 'axios';
 import router from '@/router';
+import { mapState } from 'vuex';
+import { MessageBox } from 'element-ui';
 export default {
     data() {
         return {
-            notes: [
-                // Replace this array with your actual note data received from the backend
-                {
-                    id: 1,
-                    title: '示例笔记标题1',
-                    content: '示例笔记内容1，这是一个示例内容，这里是笔记的大概内容...',
-                    username: '示例用户1',
-                    avatar: 'https://img0.baidu.com/it/u=4249059699,588833540&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1690304400&t=54768f9fa16136e59e6b77212115969d',
-                    publishTime: '2023-07-24 12:34',
-                },
-                {
-                    id: 2,
-                    title: '示例笔记标题2',
-                    content: '示例笔记内容2，这是另一个示例内容，这里是笔记的大概内容...',
-                    username: '示例用户2',
-                    avatar: 'https://img1.baidu.com/it/u=3772409731,4008680566&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto?sec=1690304400&t=5deeea67a0442ec3d25e007efb8d6731',
-                    publishTime: '2023-07-25 10:45',
-                },
-                // Add more sample notes here...
-            ],
+            notes: [],
         };
     },
     async mounted() {
         const notes = await axios.get(`http://localhost:3000/note/noteslist`)
-        console.log(notes.data)
+        // console.log(notes.data)
         this.notes = notes.data
+    },
+    computed: {
+        ...mapState(['userInfo'])
     },
     methods: {
         toWrite() {
             router.push('/home/note/writing')
         },
         // 点击“删除”按钮的处理函数
-        deleteNote(id) {
-            // 在此处编写删除笔记的逻辑
-            // 你可以在此处调用后端接口来实现删除笔记的操作
-            console.log(`删除笔记，id: ${id}`);
+        async deleteNote(id) {
+            // 使用MessageBox确认提示框
+            MessageBox.confirm('确定要删除这条笔记吗？', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(async () => {
+                const notesDel = await axios.delete(`http://localhost:3000/note/deletenote/${id}`, {
+                    params: {
+                        user: this.userInfo.username
+                    }
+                });
+                //console.log(notesDel); // 这将显示服务器返回的响应数据
+                // 成功删除后更新前端数据
+                if (notesDel.status === 201) {
+                    this.notes = this.notes.filter((note) => note.id !== id)
+                    this.$message.success({
+                        message: notesDel.data,
+                        duration: 500
+                    })
+                } else {
+                    this.$message.error({
+                        message: notesDel.data,
+                        duration: 500
+                    })
+                }
+            }).catch(() => {
+                // 点击取消按钮时的操作，不需要额外处理
+            });
         },
         // 点击“修改”按钮的处理函数
         editNote(id) {
-            // 在此处编写修改笔记的逻辑
-            // 你可以根据id获取对应的笔记信息，然后进入修改笔记页面
             console.log(`修改笔记，id: ${id}`);
+            router.push({
+                path: '/home/note/updatenote',
+                query: {
+                    articleId: id
+                }
+            })
         },
         // 跳转到笔记详情
-        toNoteDetail() {
-            console.log(111)
+        toNoteDetail(id) {
+            router.push({
+                path: '/home/note/detail',
+                query: {
+                    articleId: id
+                }
+            })
+        },
+        // 判断是否为当前登录用户显示对应的删除修改按钮
+        isCurrentUser(username) {
+            return this.userInfo && this.userInfo.username === username;
         }
 
     }
