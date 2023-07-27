@@ -46,7 +46,7 @@
             <el-card v-for="review in course.reviews" :key="review.id" class="review-card">
                 <div class="review-header">
                     <img class="avatar" :src="review.avatar" alt="用户头像">
-                    <p class="username">{{ review.user }}</p>
+                    <p class="username">{{ review.username }}</p>
                 </div>
                 <p>评分：{{ review.rating }}</p>
                 <p>{{ review.comment }}</p>
@@ -417,7 +417,10 @@ h3 {
 .evaluate {
     margin-top: 30px;
 }
-
+.review-header {
+    display: flex;
+    align-items: center;
+}
 .review-card {
     margin-bottom: 10px;
     margin-top: 10px;
@@ -438,7 +441,8 @@ h3 {
 }
 
 .username {
-    font-weight: bold;
+    font-size: 13px;
+    color: #3F97F0;
 }
 
 .reviewNone {

@@ -9,7 +9,7 @@
             <img :src="note.avatar" alt="User Avatar" class="avatar" />
             <div class="note-info">
                 <h3 class="contentTitle" @click="toNoteDetail(note.id)">{{ note.title }}</h3>
-                <p>{{ note.content }}</p>
+                <p>{{ stripHtmlTags(note.content) }}</p>
                 <p class="user-info">{{ note.username }} - {{ note.created_at }}</p>
             </div>
             <div class="note-buttons">
@@ -33,7 +33,7 @@ export default {
     },
     async mounted() {
         const notes = await axios.get(`http://localhost:3000/note/noteslist`)
-        // console.log(notes.data)
+        console.log(notes.data[0].content)
         this.notes = notes.data
     },
     computed: {
@@ -96,8 +96,11 @@ export default {
         // 判断是否为当前登录用户显示对应的删除修改按钮
         isCurrentUser(username) {
             return this.userInfo && this.userInfo.username === username;
-        }
-
+        },
+        // 去掉html标签
+        stripHtmlTags(htmlString) {
+            return htmlString.replace(/<[^>]+>/g, '');
+        },
     }
 };
 </script>

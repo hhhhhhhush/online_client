@@ -22,9 +22,14 @@
                         <span class="carNum"> {{ this.sqlCourseInfo.length }} </span>
                     </span>
                     <el-avatar :size="26" :src="userInfo.avatar"></el-avatar>
-                    <span @click="personal">
+                    <!-- <span @click="personal">
                         {{ userInfo.username }}
-                    </span>
+                    </span> -->
+
+                    <el-popover placement="top-start" title="签名:" width="200" trigger="hover" :content="userInfo.signature"
+                        @click.native="personal">
+                        <el-button slot="reference">{{ userInfo.username }}</el-button>
+                    </el-popover>
                     <el-button type="text" @click="exit" class="exit">退出</el-button>
                     <span @click="myMessage">系统消息</span>
                 </div>
@@ -57,7 +62,7 @@ export default {
                 { id: 2, href: "/home/total", name: "全部课程" },
                 { id: 3, href: "/home/note", name: "学习笔记" },
                 { id: 4, href: "/home/doit", name: "实战" },
-                { id: 5, href: "/home/activity", name: "活动" },
+                { id: 5, href: "/home/activity", name: "联名商城" },
             ],
             activeIndex: 0,
             courseInfo: null,
@@ -135,6 +140,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .headerBox {
     width: 100%;
     border-bottom: 1px solid #f3f3f3;
@@ -225,9 +231,9 @@ footer {
     text-align: center;
     color: #93999F;
     font-size: 14px;
-    height: 30px;
-    line-height: 30px;
-    padding: 20px 0;
+    height: 20px;
+    line-height: 20px;
+    padding: 12px 0;
 }
 
 .custom-backtop {
