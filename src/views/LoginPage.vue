@@ -6,8 +6,8 @@
                 <img src="../images/youyuxu.png" alt="">
                 <p class="banner">用 心 做 教 育</p>
                 <ul>
-                    <li>帮助</li>
-                    <li>关于我们</li>
+                    <li @click="toHelp">帮助</li>
+                    <li @click="toAbout">关于我们</li>
                     <li class="toUs">
                         联系我们
                         <div class="contact">
@@ -55,8 +55,8 @@
                 </el-form-item>
                 <el-button plain class="loginBtn" @click="toRegister">注册</el-button>
             </el-form>
-
         </div>
+        <router-view></router-view>
     </div>
 </template>
 
@@ -74,7 +74,7 @@ export default {
             countdown: 0, // 倒计时秒数
             isCounting: false, // 是否正在倒计时,
             showQRCode: false, // 控制二维码图片的显示与隐藏,
-            rememberPwd:false, //记住密码功能
+            rememberPwd: false, //记住密码功能
             userAavatar: "https://preview.qiantucdn.com/58pic/20220311/00M58PICeYaWsZ1WF84MN_PIC2018_PIC2018.jpg%21w290_290",
             ruleForm: {
                 username: '',
@@ -111,18 +111,18 @@ export default {
         // 页面加载时，检测是否本地存储中是否保存了密码
         const localUsername = localStorage.getItem('phone')
         const localPassword = localStorage.getItem('password')
-        if( localUsername&&localPassword ) {
+        if (localUsername && localPassword) {
             this.ruleForm.username = localUsername
             this.ruleForm.password = localPassword
             this.rememberPwd = true
         }
     },
     watch: {
-        rememberPwd(newVal,oldVal) {
-            if( newVal ) {
+        rememberPwd(newVal, oldVal) {
+            if (newVal) {
                 // 勾选了记住密码，保存用户名和密码到本地存储
-                localStorage.setItem("phone",this.ruleForm.username)
-                localStorage.setItem("password",this.ruleForm.password)
+                localStorage.setItem("phone", this.ruleForm.username)
+                localStorage.setItem("password", this.ruleForm.password)
             } else {
                 // 取消勾选记住密码，移除本地存储中的用户名和密码
                 localStorage.removeItem("phone")
@@ -251,6 +251,14 @@ export default {
                 this.$message.error(regRes.data.msg);
             }
         },
+        // 进入帮助页面
+        toHelp() {
+            router.push('/help')
+        },
+        // 进入关于我们页面
+        toAbout() {
+            router.push('/about')
+        }
     }
 }
 </script>
@@ -395,6 +403,7 @@ export default {
     border-bottom: 4px solid #FA2;
     padding-bottom: 8px;
 }
+
 .pwdManager {
     display: flex;
     justify-content: space-between;
@@ -402,6 +411,7 @@ export default {
     align-items: center;
     padding: 0 12px;
 }
+
 .pwdManager .forgot {
     color: #0080ff;
     cursor: pointer;

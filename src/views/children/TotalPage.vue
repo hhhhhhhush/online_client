@@ -64,6 +64,7 @@ export default {
     console.log(categoryRes.data)
   },
   computed: {
+    // 过滤展示相应分类的课程
     filteredCourses() {
       if (this.activeCategory === '全部') {
         return this.courses;
@@ -71,17 +72,20 @@ export default {
         return this.courses.filter(course => course.category_id === this.activeCategory);
       }
     },
+    // 总页码
     totalPages() {
       return Math.ceil(this.filteredCourses.length / this.pageSize);
     },
+    // 展示当前页显示的课程
     displayedCourses() {
       const startIndex = (this.currentPage - 1) * this.pageSize;
       const endIndex = startIndex + this.pageSize;
+      // 返回截取的页码的长度，slice就是截取末地址-首地址（不包含首地址）
       return this.filteredCourses.slice(startIndex, endIndex);
     },
   },
   methods: {
-    // 字数截取
+    // 截取5行
     truncate(text, lines) {
       const words = text.split(' ');
       if (words.length <= lines) {
@@ -90,8 +94,8 @@ export default {
         return words.slice(0, lines).join(' ') + '...';
       }
     },
-    changeCategory(category) {
-      this.activeCategory = category;
+    changeCategory(categoryId) {
+      this.activeCategory = categoryId;
       this.currentPage = 1;
     },
     // 关键字查询  
@@ -106,6 +110,7 @@ export default {
       this.currentPage = 1;
       // console.log(111)
     },
+    // 将当前页码作为参数传递
     handlePageChange(currentPage) {
       this.currentPage = currentPage;
     },

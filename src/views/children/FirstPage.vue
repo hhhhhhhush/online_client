@@ -124,6 +124,7 @@ export default {
         filteredCourseInfo() {
             // 因为是异步获取数据，所以要先判断是否为空
             if (this.courseInfo !== null) {
+                // 对元素进行随机洗牌。通过从随机生成的数字（介于 0 和 1 之间）中减去 0.5，元素将被随机排序，可能是升序或降序，从而实现了数组的随机洗牌。
                 const shuffled = this.courseInfo.sort(() => Math.random() - 0.5);
                 // 取前五个数据
                 return shuffled.slice(0, 5);

@@ -27,6 +27,8 @@ const router = new VueRouter({
         { path: '/home/message', component: () => import('@/views/children/PersonalMsg.vue') },
       ]
     },
+    { path: '/help', component: () => import('@/views/children/HelpDocument.vue') },
+    { path: '/about', component: () => import('@/views/children/AboutPage.vue') },
   ]
 })
 
