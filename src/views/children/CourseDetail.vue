@@ -74,6 +74,7 @@
 import axios from 'axios'
 import router from '@/router/index'
 import { mapMutations, mapState } from 'vuex';
+import { eventBus } from '@/main';
 export default {
     data() {
         return {
@@ -92,7 +93,7 @@ export default {
             courseId: null,
             courseInfo: null,
             sqlCourseInfo: null,  //数据库中当前用户课程数据,
-            totalLength:null //当前用户在数据库购物车数据表中的数据长度
+            totalLength: null //当前用户在数据库购物车数据表中的数据长度
         };
     },
     async mounted() {
@@ -124,7 +125,7 @@ export default {
             this.sqlCourseInfo = CarRes.data.data
             this.totalLength = this.sqlCourseInfo.length; // 将获取的数据长度赋值给 totalLength
             // 将长度赋值给vuex中的totalLength
-            this.$store.commit('setTotalLength',this.totalLength)
+            this.$store.commit('setTotalLength', this.totalLength)
         },
         // 加入购物车逻辑
         async addCart() {
@@ -142,8 +143,8 @@ export default {
                 const foundId = this.sqlCourseInfo.find(item => item.course_id === this.courseInfo.id);
                 if (foundId) {
                     this.$message.error({
-                        message:"请勿重复添加哦~",
-                        duration:1000
+                        message: "请勿重复添加哦~",
+                        duration: 1000
                     });
                 } else {
                     // 添加到数据库
@@ -157,21 +158,23 @@ export default {
                         description: this.courseInfo.description
 
                     }).then(() => {
+                        // 向事件总线发送 addToCart 事件，并将商品信息作为参数传递,也可以不传递或者不用这个参数
+                        eventBus.$emit('addToCart', carItem);
                         this.$message.success({
-                            message:"商品添加成功~",
-                            duration:1000
+                            message: "商品添加成功~",
+                            duration: 1000
                         })
                     }).catch(error => {
                         console.error(error);
                         this.$message.error({
-                            message:"添加商品失败",
-                            duration:1000
+                            message: "添加商品失败",
+                            duration: 1000
                         });
-                        
+
                     })
                 }
             });
-
+            // 同步添加到vuex中
             this.addToCart(carItem);
             this.getSqlInfo();
         },
@@ -417,10 +420,12 @@ h3 {
 .evaluate {
     margin-top: 30px;
 }
+
 .review-header {
     display: flex;
     align-items: center;
 }
+
 .review-card {
     margin-bottom: 10px;
     margin-top: 10px;

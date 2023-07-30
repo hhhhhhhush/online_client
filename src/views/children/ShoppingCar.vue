@@ -71,6 +71,7 @@
 import axios from 'axios';
 import router from '@/router';
 import { mapState } from 'vuex';
+import { eventBus } from '@/main';
 
 export default {
     data() {
@@ -116,6 +117,7 @@ export default {
                 .then(async () => {
                     // 如果当前商品对象的ID与要删除的商品ID不相等，filter方法会将其保留在数组中，否则不保留，从而将要删除的商品过滤掉
                     this.sqlCourseInfo = this.sqlCourseInfo.filter(i => i.id !== item.id);
+                    eventBus.$emit('addToCart');
                     // 从数据库中删除该商品
                     await axios.delete(`http://localhost:3000/cart/remove/${item.id}`);
                     this.$message.success({

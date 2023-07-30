@@ -39,6 +39,7 @@
                 </div>
             </nav>
         </article>
+        <!-- 路由出口 -->
         <router-view></router-view>
         <el-backtop :bottom="100" :right="100">
             <div class="custom-backtop">回到顶部</div>
@@ -52,6 +53,7 @@
 import axios from 'axios';
 import router from '@/router/index';
 import { mapState } from 'vuex';
+import { eventBus } from '@/main';
 export default {
     name: 'home',
     data() {
@@ -79,6 +81,13 @@ export default {
             // 获取当前登录用户的购物车数据
             this.getSqlInfo();
         }
+
+        // 监听 addToCart 事件，当事件触发时执行 getSqlInfo 方法
+        eventBus.$on('addToCart', () => {
+            if (this.userInfo) {
+                this.getSqlInfo();
+            }
+        });
     },
     computed: {
         ...mapState(['userInfo', 'shopcarInfo', 'totalLength'])
@@ -140,7 +149,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .headerBox {
     width: 100%;
     border-bottom: 1px solid #f3f3f3;
